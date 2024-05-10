@@ -1,0 +1,406 @@
+﻿The Nature Nectar Grocery Retail Store
+
+
+CSE202: Fundamentals of Database Management Systems
+
+
+Deadline 3: Database schema and indexes creation with  integrity constraints and data insertion (populate simulated data satisfying the constraints)
+
+
+Contributors:
+
+
+Lakshay Trehan (2022267):
+
+(Database Schema and Indexes Creation)
+
+
+
+Karanjeet Singh (2022235):
+
+(Data Insertion and Integrity Constraints)
+
+
+
+SQL CODE FOR TABLE CREATION AND DATA INSERTION:
+
+
+
+
+-- Create User Table
+CREATE TABLE User (
+    UserID INT PRIMARY KEY AUTO_INCREMENT,
+    Username VARCHAR(255) NOT NULL,
+    Password VARCHAR(255) NOT NULL,
+    Role VARCHAR(50) NOT NULL,
+    Permissions VARCHAR(255),
+    PersonalInformation TEXT
+);
+
+
+-- Create Category Table
+CREATE TABLE Category (
+    CategoryID INT PRIMARY KEY AUTO_INCREMENT,
+    CategoryName VARCHAR(255) NOT NULL
+);
+
+
+-- Create Product Table
+CREATE TABLE Product (
+    ProductID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(255) NOT NULL,
+    Description TEXT,
+    Price DECIMAL(10, 2) NOT NULL,
+    CategoryID INT,
+    MSP DECIMAL(10, 2) CHECK (MSP >= 0), -- Adding check constraint for MSP
+    FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID)
+);
+
+
+
+
+-- Create Inventory Table
+CREATE TABLE Inventory (
+    ProductID INT PRIMARY KEY,
+    Quantity INT NOT NULL,
+    LowInventoryAlert INT,
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+);
+
+
+-- Create ShoppingCart Table
+CREATE TABLE ShoppingCart (
+    CartID INT PRIMARY KEY AUTO_INCREMENT,
+    UserID INT,
+    ProductID INT,
+    Quantity INT,
+    TotalPrice DECIMAL(10, 2),
+    Status VARCHAR(50) DEFAULT 'Active',
+    FOREIGN KEY (UserID) REFERENCES User(UserID),
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+);
+
+
+
+
+
+
+
+
+-- Create Order Table
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY AUTO_INCREMENT,
+    UserID INT,
+    TotalAmount DECIMAL(10, 2) NOT NULL,
+    OrderDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserID) REFERENCES User(UserID)
+);
+
+
+-- Create Vendor Table
+CREATE TABLE Vendor (
+    VendorID INT PRIMARY KEY AUTO_INCREMENT,
+    VendorName VARCHAR(255) NOT NULL,
+    RegistrationDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- Create VendorApplication Table
+CREATE TABLE VendorApplication (
+    ApplicationID INT PRIMARY KEY AUTO_INCREMENT,
+    VendorID INT,
+    Status VARCHAR(50) DEFAULT 'Pending',
+    Documents TEXT,
+    FOREIGN KEY (VendorID) REFERENCES Vendor(VendorID)
+);
+
+
+-- Create Procurement Table
+CREATE TABLE Procurement (
+    ProcurementID INT PRIMARY KEY AUTO_INCREMENT,
+    VendorID INT,
+    GovernmentOfficialID INT,
+    MSP DECIMAL(10, 2) NOT NULL,
+    ApprovalStatus VARCHAR(50) DEFAULT 'Pending',
+    FOREIGN KEY (VendorID) REFERENCES Vendor(VendorID),
+    FOREIGN KEY (GovernmentOfficialID) REFERENCES User(UserID)
+);
+
+
+-- Create Sales Table
+CREATE TABLE Sales (
+    SaleID INT PRIMARY KEY AUTO_INCREMENT,
+    ProductID INT,
+    QuantitySold INT,
+    SaleDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+);
+
+
+-- Create Analytics Table
+CREATE TABLE Analytics (
+    AnalyticsID INT PRIMARY KEY AUTO_INCREMENT,
+    ReportType VARCHAR(255) NOT NULL,
+    ReportData TEXT,
+    GenerationDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- Create Feedback Table
+CREATE TABLE Feedback (
+    FeedbackID INT PRIMARY KEY AUTO_INCREMENT,
+    UserID INT,
+    ProductID INT,
+    Rating INT,
+    Comment TEXT,
+    FOREIGN KEY (UserID) REFERENCES User(UserID),
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+);
+
+
+-- Insert data into User table
+INSERT INTO User (Username, Password, Role, Permissions, PersonalInformation) 
+VALUES 
+('john_doe', 'password123', 'Admin', 'admin_permissions', 'John Doe, admin, USA'),
+('jane_smith', 'securepass', 'User', 'user_permissions', 'Jane Smith, user, Canada'),
+('bob_jackson', 'bobpass', 'User', 'user_permissions', 'Bob Jackson, user, UK'),
+('alice_green', 'greenpass', 'User', 'user_permissions', 'Alice Green, user, Australia'),
+('mike_brown', 'mikepass', 'User', 'user_permissions', 'Mike Brown, user, Germany'),
+('sara_white', 'sarapass', 'User', 'user_permissions', 'Sara White, user, France'),
+('david_miller', 'davidpass', 'User', 'user_permissions', 'David Miller, user, Spain'),
+('emily_wilson', 'emilypass', 'User', 'user_permissions', 'Emily Wilson, user, Italy'),
+('adam_taylor', 'adampass', 'User', 'user_permissions', 'Adam Taylor, user, Japan'),
+('lisa_anderson', 'lisapass', 'User', 'user_permissions', 'Lisa Anderson, user, Brazil');
+
+
+-- Insert data into Category table
+INSERT INTO Category (CategoryName)
+VALUES 
+('Electronics'),
+('Clothing'),
+('Books'),
+('Home & Kitchen'),
+('Sports'),
+('Beauty'),
+('Toys'),
+('Food'),
+('Automotive'),
+('Health');
+
+
+-- Insert data into Product table
+INSERT INTO Product (Name, Description, Price, CategoryID, MSP)
+VALUES 
+('Laptop', 'High-performance laptop', 999.99, 1, 899.99),
+('T-shirt', 'Cotton T-shirt', 19.99, 2, 15.99),
+('Python Programming Book', 'Learn Python programming', 29.99, 3, 24.99),
+('Blender', 'High-speed blender', 79.99, 4, 69.99),
+('Football', 'Official size football', 29.99, 5, 24.99),
+('Shampoo', 'Hair care shampoo', 9.99, 6, 7.99),
+('Action Figure', 'Superhero action figure', 14.99, 7, 11.99),
+('Rice', 'Long-grain rice', 4.99, 8, 3.99),
+('Car Battery', '12V car battery', 99.99, 9, 89.99),
+('Vitamin C Supplement', 'Vitamin C tablets', 12.99, 10, 10.99);
+
+
+-- Insert data into Inventory table
+INSERT INTO Inventory (ProductID, Quantity, LowInventoryAlert)
+VALUES 
+(1, 50, 10),
+(2, 100, 20),
+(3, 30, 5),
+(4, 40, 10),
+(5, 60, 15),
+(6, 80, 25),
+(7, 70, 20),
+(8, 200, 50),
+(9, 30, 10),
+(10, 100, 30);
+
+
+-- Insert data into ShoppingCart table
+INSERT INTO ShoppingCart (UserID, ProductID, Quantity, TotalPrice)
+VALUES 
+(1, 3, 2, 59.98),
+(2, 7, 1, 14.99),
+(3, 1, 1, 999.99),
+(4, 5, 3, 89.97),
+(5, 10, 2, 25.98),
+(6, 2, 2, 39.98),
+(7, 9, 1, 99.99),
+(8, 8, 5, 24.95),
+(9, 4, 1, 79.99),
+(10, 6, 4, 39.96);
+
+
+-- Insert data into Orders table
+INSERT INTO Orders (UserID, TotalAmount)
+VALUES 
+(1, 59.98),
+(2, 14.99),
+(3, 999.99),
+(4, 89.97),
+(5, 25.98),
+(6, 39.98),
+(7, 99.99),
+(8, 24.95),
+(9, 79.99),
+(10, 39.96);
+
+
+-- Insert data into Vendor table
+INSERT INTO Vendor (VendorName)
+VALUES 
+('Tech Solutions'),
+('Fashion House'),
+('Book Emporium'),
+('Kitchen Gadgets'),
+('Sports Galaxy'),
+('Beauty Haven'),
+('Toy Universe'),
+('Grocery Mart'),
+('Auto Parts Express'),
+('Health Store');
+
+
+-- Insert data into VendorApplication table
+INSERT INTO VendorApplication (VendorID, Documents)
+VALUES 
+(1, 'Business License, Tax ID'),
+(2, 'Business Registration Certificate'),
+(3, 'Vendor Agreement'),
+(4, 'Vendor Registration Form'),
+(5, 'Product Catalog'),
+(6, 'Certifications'),
+(7, 'Product Samples'),
+(8, 'Supplier Agreements'),
+(9, 'Manufacturer Certificates'),
+(10, 'Product Ingredients List');
+
+
+-- Insert data into Procurement table
+INSERT INTO Procurement (VendorID, GovernmentOfficialID, MSP)
+VALUES 
+(1, 1, 899.99),
+(2, 1, 15.99),
+(3, 1, 24.99),
+(4, 1, 69.99),
+(5, 1, 24.99),
+(6, 1, 7.99),
+(7, 1, 11.99),
+(8, 1, 3.99),
+(9, 1, 89.99),
+(10, 1, 10.99);
+
+
+-- Insert data into Sales table
+INSERT INTO Sales (ProductID, QuantitySold)
+VALUES 
+(1, 10),
+(2, 20),
+(3, 5),
+(4, 15),
+(5, 10),
+(6, 25),
+(7, 20),
+(8, 50),
+(9, 10),
+(10, 30);
+
+
+-- Insert data into Analytics table
+INSERT INTO Analytics (ReportType, ReportData)
+VALUES 
+('Sales', 'Monthly sales report'),
+('Inventory', 'Inventory tracking report'),
+('Customer', 'Customer demographics report'),
+('Financial', 'Profit and loss statement'),
+('Product', 'Best-selling products report'),
+('Vendor', 'Vendor performance report'),
+('Feedback', 'Customer feedback analysis'),
+('Order', 'Order fulfillment report'),
+('Procurement', 'Procurement analysis'),
+('Website', 'Website traffic report');
+
+
+-- Insert data into Feedback table
+INSERT INTO Feedback (UserID, ProductID, Rating, Comment)
+VALUES 
+(1, 3, 5, 'Great book, highly recommended!'),
+(2, 7, 4, 'Good quality action figure.'),
+(3, 1, 5, 'Excellent laptop, very satisfied.'),
+(4, 5, 4, 'Good football, durable material.'),
+(5, 10, 4, 'Effective vitamin C supplement.'),
+(6, 2, 3, 'Average quality t-shirt.'),
+(7, 9, 5, 'Perfect fit for my car.'),
+(8, 8, 4, 'Good rice, value for money.'),
+(9, 4, 3, 'Blender works well, but a bit noisy.'),
+(10, 6, 5, 'Great shampoo, leaves hair soft and shiny.');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
